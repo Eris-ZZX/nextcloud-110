@@ -20,8 +20,6 @@ jobs:
           printf '%s\n' "$SSH_KEY" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts
-          rsync -az \
-            --exclude '.git' \
-            --exclude '.github' \
-            ./ "root@${HOST}:/opt/nextcloud-deploy/"
+          tar -czf - --exclude .git --exclude .github . \
+            | ssh "root@${HOST}" "mkdir -p /opt/nextcloud-deploy && tar -xzf - -C /opt/nextcloud-deploy"
           ssh "root@${HOST}" "bash /opt/nextcloud-deploy/deploy/apply.sh"
